@@ -1,0 +1,7 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ index.php [QSA,L] # mod_php
+    #RewriteRule ^(.*)$ fcgi://127.0.0.1:9001/srv/http/rakitan/public/index.php [P,END] # php-fpm
+</IfModule>
