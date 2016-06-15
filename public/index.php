@@ -10,20 +10,18 @@ $injector = include(__DIR__.'/../src/dependency.php');
 $request = $injector->make('Symfony\Component\HttpFoundation\Request');
 
 /* @var $app Application */
-//$app = $injector->make('Application'); // app without middleware
-
-$injector->define('Middleware\PhpDebugBar', ['app' => 'Application']);
-$app = $injector->make('Middleware\PhpDebugBar');
-
-/* uncomment to enable JWT Auth middleware
-$injector->define('Middleware\JwtAuthentication', ['app' => 'Application']);
-$app = $injector->make('Middleware\JwtAuthentication');
- */
 
 if ('prod' == $config['environment']) {
+    $app = $injector->make('Application'); // app without middleware
     $response = $app->handle($request);
-} else {
+} elseif ('dev' == $config['environment']) {
+    $injector->define('Middleware\PhpDebugBar', ['app' => 'Application']);
+    $injector->define('Middleware\Whoops', ['app' => 'Middleware\PhpDebugBar']);
+    $app = $injector->make('Middleware\Whoops');
     $response = $app->handle($request, HttpKernelInterface::MASTER_REQUEST, false);
+} elseif ('test' == $config['environment']) {
+    $app = $injector->make('Application'); // app without middleware
+    $response = $app->handle($request);
 }
 
 $response->send();
