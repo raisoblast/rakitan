@@ -1,6 +1,7 @@
 <?php
 
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -78,6 +79,14 @@ class Application implements HttpKernelInterface
                 ]);
                 $response->setStatusCode(Response::HTTP_NOT_FOUND);
             }
+        } catch (HttpException $e) {
+            if (!$catch) {
+                throw $e;
+            }
+            $response = $this->dispatcher->dispatch('Home#error', [
+                'message' => '['.$e->getCode().'] '.$e->getMessage()
+            ]);
+            $response->setStatusCode($e->getStatusCode());
         } catch (Exception $e) {
             if (!$catch) {
                 throw $e;
@@ -113,7 +122,7 @@ class Application implements HttpKernelInterface
         $action = '';
         if ($match['name'] == 'default-route') {
             $controller = $match['params']['controller'];
-            $action = $match['params']['action'];
+            $action = isset($match['params']['action']) ? $match['params']['action'] : 'index';
             $match['target'] = ucfirst($controller).'#'.$action;
             $match['params'] = []; // kosongi agar tidak diproses di controller
         } elseif ($match['name'] == 'default-module-route') {

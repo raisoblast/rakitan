@@ -1,5 +1,7 @@
 <?php
 
+use Symfony\Component\HttpKernel\Exception\HttpException;
+
 /**
  * route dispatcher
  * 
@@ -32,16 +34,16 @@ class Dispatcher
     {
         $matches = null;
         if (false === preg_match('/[#|\/]/', $target, $matches)) {
-            throw new Exception('Invalid route: '.$target);
+            throw new HttpException(404, 'Invalid route: '.$target);
         }
         list($class, $method) = explode($matches[0], $target, 2);
         $class = 'Controller\\'.$class;
         if (!class_exists($class)) {
-            throw new Exception(sprintf('Controller "%s" does not exist.', $class));
+            throw new HttpException(404, sprintf('Controller "%s" does not exist.', $class));
         }
         $instance = $this->injector->make($class);
         if (!method_exists($instance, $method)) {
-            throw new Exception(sprintf('Action "%s" not found on controller "%s"', $method, $class));
+            throw new HttpException(404, sprintf('Action "%s" not found on controller "%s"', $method, $class));
         }
         return [$instance, $method];
     }
