@@ -1,4 +1,7 @@
+[![Build Status](https://travis-ci.org/raisoblast/rakitan.svg?branch=master)](https://travis-ci.org/raisoblast/rakitan)
+
 ![rakitan](public/asset/img/rakitan.png)
+
 # rakitan
 Very simple component-based PHP framework
 
